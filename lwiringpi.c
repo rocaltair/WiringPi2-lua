@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <lua.h>
 #include <lauxlib.h>
+#include <unistd.h>
 
 #if LUA_VERSION_NUM < 502
 #  define luaL_newlib(L,l) (lua_newtable(L), luaL_register(L,NULL,l))
@@ -349,10 +350,17 @@ static int lua__piHiPri(lua_State *L)
 
 // Extras from arduino land
 
+static int lua__sleep(lua_State *L)
+{
+	lua_Number seconds = luaL_checknumber(L, 1);
+	sleep(seconds);
+	return 0;
+}
+
 static int lua__delay(lua_State *L)
 {
-	lua_Number howLong = luaL_checknumber(L, 1);
-	delay((unsigned int)howLong);
+	lua_Number ms = luaL_checknumber(L, 1);
+	delay((unsigned int)ms);
 	return 0;
 }
 
@@ -415,6 +423,7 @@ int luaopen_lwiringpi(lua_State* L)
 		{"piHiPri", lua__piHiPri},
 		{"delayMicroseconds", lua__delayMicroseconds},
 		{"delay", lua__delay},
+		{"sleep", lua__sleep},
 		{"piBoardId", lua__piBoardId},
 		{NULL, NULL},
 	};
